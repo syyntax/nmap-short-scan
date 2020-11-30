@@ -1,0 +1,2 @@
+# stegifier
+Stegonagraphy tool
