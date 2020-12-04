@@ -71,7 +71,10 @@ def create_scope(scope):
 
 def run_scan(obj):
     file = f"{pwd}/{obj.client.replace(' ', '').lower()}-{obj.contract}-20201204-{obj.analyst}"
-    print(f"Output results using this file naming convention: {file}")
+    for i in range(0, len(obj.scope)):
+        print(f"Nmap scan on {obj.scope[i].address}...\n")
+        system(f"nmap -sS -vv -n -Pn --max-retries 2 --top-ports 1000 -oA {pwd}/{obj.client.replace(' ', '').lower()}-"
+               f"{obj.contract}-date-nmap-t1000-{obj.analyst} {obj.scope[i].address}")
 
 
 run_checks(args.client, args.contract, args.scope)
