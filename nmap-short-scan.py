@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 from argparse import ArgumentParser
 from re import compile, match
-from os import getcwd
+from os import getcwd, system
 from getpass import getuser
 
 pwd = getcwd()
@@ -41,6 +41,8 @@ class Asset:
             raise Exception(f"You must provide an IP or URL.")
         elif match(regex_ip4, address) or match(regex_domain, address):
             self.address = str(address)
+        else:
+            raise Exception(f"\"{address}\" does not match a valid pattern for IPv4 or domain.")
 
 
 def run_checks(client, contract, scope):
@@ -67,9 +69,11 @@ def create_scope(scope):
     return obj_list
 
 
+def run_scan(obj):
+    file = f"{pwd}/{obj.client.replace(' ', '').lower()}-{obj.contract}-20201204-{obj.analyst}"
+    print(f"Output results using this file naming convention: {file}")
+
+
 run_checks(args.client, args.contract, args.scope)
-scan = Scan(args.analyst, args.client, args.contract)
-a = create_scope(args.scope)
-
-
-
+scan = Scan(args.analyst, args.client, args.contract, create_scope(args.scope))
+run_scan(scan)
