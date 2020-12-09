@@ -2,7 +2,7 @@
 from argparse import ArgumentParser
 from datetime import date
 from re import compile, match
-from os import getcwd, system
+from os import getcwd, system, listdir, path
 from getpass import getuser
 
 pwd = getcwd() # Get the present working directory
@@ -113,6 +113,13 @@ def run_scan(obj: object, scan_type):
 
 def do_scans(obj: object):
     [run_scan(obj, x) for x in scan_types]
+
+
+def convert_xsl(file):
+    files = [f for f in listdir(f'{pwd}') if path.isfile(f)]
+    for f in files:
+        if f[-4:] == ".xml":
+            system(f"xsltproc {f} -o {pwd}/{f[:-4]}.html")
 
 
 # Run the function to validate the argument parameters
