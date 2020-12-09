@@ -1,0 +1,20 @@
+.\" Manpage for nmap-short-scan
+.\" Contact jason.scott@alpinesecurity to correct errors or typos.
+.TH man 8 "09 December 2020" "1.0" "nmap-short-scan man page"
+.SH Nmap-short-scan
+nmap-short-scan \- run a series of standardized nmap scans.
+.SH SYNOPSIS
+nmap-short-scan --analyst [ANALYST] --client [CLIENT] --contract [CONTRACT] --scope [SCOPE]
+.SH DESCRIPTION
+nmap-short-scan is a Python 3.X wrapper for specific nmap commands that outputs results into a standardized format.
+.SH OPTIONS
+    \--analyst ANALYST              The name of the analyst running the tool (e.g. "John Smith; default is OS username)
+    \--client CLIENT                The business name of the client (e.g. "Bob's Repair Shop")
+    \--contract CONTRACT            The 8-digit contract number (e.g. 12345678)
+    \--scope FILE                   The relative filename of the scope file (e.g. Documents/scope.txt)
+.SH EXAMPLES
+nmap-short-scan --analyst jsmith --client "Bob's Repair Shop" --contract 12345678 --scope scope.txt
+.SH BUGS
+No known bugs.
+.SH AUTHOR
+Jason Scott (jason.scott@alpinesecurity.com)
