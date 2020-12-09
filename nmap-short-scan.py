@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 from argparse import ArgumentParser
+from datetime import date
 from re import compile, match
 from os import getcwd, system
 from getpass import getuser
@@ -10,19 +11,22 @@ regex_contract = compile("^[0-9]{8}$") # Regex for client contract numbers
 regex_ip4 = compile("^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4]"
                     "[0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$") # Regex for IPv4
 regex_domain = compile("(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]") # Domain regex
+scan_types = ['t1000', 'u1000', 'a1000', 's65K']
+today = date.today()
 
 # Create the argument parser and add argument parameters
 parser = ArgumentParser(description='Run a short nmap scan.')
-parser.add_argument('--analyst', action='store', help='Enter the name of the ' \
-'analyst (e.g. John Smith).', type=str, dest='analyst', default=getuser())
-parser.add_argument('--client', action='store', help='Enter the name of the ' \
-'client (e.g. Evil Corp).', type=str, dest='client', default=None)
-parser.add_argument('--contract', action='store', help='Enter the contract ' \
-'number (e.g. 20081101).', type=str, dest='contract', default=None)
-parser.add_argument('--scope', action='store', help='Enter the filepath of ' \
-'the file that contains the list of IPs/URLs (e.g. /path/to/file)', type=str,
-dest='scope', default=None)
+parser.add_argument('--analyst', action='store', help='Enter the name of the analyst (e.g. John Smith).', type=str,
+                    dest='analyst', default=getuser())
+parser.add_argument('--client', action='store', help='Enter the name of the client (e.g. Evil Corp).', type=str,
+                    dest='client', default=None)
+parser.add_argument('--contract', action='store', help='Enter the contract number (e.g. 20081101).', type=str,
+                    dest='contract', default=None)
+parser.add_argument('--scope', action='store',
+                    help='Enter the filepath of the file that contains the list of IPs/URLs (e.g. /path/to/file)',
+                    type=str, dest='scope', default=None)
 args = parser.parse_args()
+
 
 # Create a class for scans that include information for file naming convention
 class Scan:
@@ -31,6 +35,7 @@ class Scan:
         self.client = str(client)
         self.contract = str(contract)
         self.scope = scope
+
 
 # Create a class for IPs/URLs that will used for the Scan.scope attribute
 class Asset:
@@ -45,6 +50,7 @@ class Asset:
         else:
             raise Exception(f"\"{address}\" does not match a valid pattern for IPv4 or domain.")
 
+
 # Perform validation check on provided arguments
 def run_checks(client: str, contract: str, scope: str):
     if client is None:
@@ -55,6 +61,7 @@ def run_checks(client: str, contract: str, scope: str):
         raise Exception(f"You must provide a scope file.")
     else:
         pass
+
 
 # Create the asset objects based on the lines in the scope file
 def create_scope(scope: str):
@@ -74,29 +81,40 @@ def create_scope(scope: str):
     return obj_list
 
 
-def run_scan(obj: object):
-    for i in range(0, len(obj.scope)):
-        # Run the Top 1000 nmap scan (SYN) on each IP/domain
+def run_scan(obj: object, scan_type):
+    # Run the Top 1000 nmap scan (SYN) on each IP/domain
+    if scan_type == 't1000':
         print(f"Nmap scan on {obj.scope[i].address}...\nRunning the Top 1000 nmap scan (SYN) on each IP/domain...")
-        system(f"nmap -sS -vv -n -Pn --max-retries 2 --top-ports 1000 -oA {pwd}/{obj.client.replace(' ', '').lower()}-"
-               f"{obj.contract}-date-nmap-t1000-{obj.analyst} {obj.scope[i].address}")
+        system(f"nmap -sS -vv -n -Pn --max-retries 2 --top-ports 1000 -iL {args.scope} -oA {pwd}/"
+               f"{obj.client.replace(' ', '').lower()}-{obj.contract}-{today.strftime('%Y%m%d')}-nmap-{scan_type}-"
+               f"{obj.analyst}")
 
-        # Run the Top 1000 nmap scan (UDP) on each IP/domain
-        print(f"Nmap scan on {obj.scope[i].address}...\nRunning the Top 1000 nmap scan (UDP) on each IP/domain...")
-        system(f"nmap -sU -vv -n -Pn --max-retries 2 --top-ports 1000 -oA {pwd}/{obj.client.replace(' ', '').lower()}-"
-               f"{obj.contract}-date-nmap-u1000-{obj.analyst} {obj.scope[i].address}")
+    # Run the Top 1000 nmap scan (UDP) on each IP/domain
+    elif scan_type == 'u1000':
+        system(f"nmap -sU -vv -n -Pn --max-retries 2 --top-ports 1000 -iL {args.scope} -oA {pwd}/"
+               f"{obj.client.replace(' ', '').lower()}-{obj.contract}-{today.strftime('%Y%m%d')}-nmap-{scan_type}-"
+               f"{obj.analyst}")
 
-        # Run the Top 1000 nmap scan (Aggressive) on each IP/domain
-        print(f"Nmap scan on {obj.scope[i].address}...\nRunning the Top 1000 nmap scan (Aggressive) on each IP/domain"
-              f"...")
-        system(f"nmap -A -vv -n -Pn --max-retries 2 --top-ports 1000 -oA {pwd}/{obj.client.replace(' ', '').lower()}-"
-               f"{obj.contract}-date-nmap-A1000-{obj.analyst} {obj.scope[i].address}")
+    # Run the Top 1000 nmap scan (Aggressive) on each IP/domain
+    elif scan_type == 'a1000':
+        system(f"nmap -A -vv -n -Pn --max-retries 2 --top-ports 1000 -iL {args.scope} -oA {pwd}/"
+               f"{obj.client.replace(' ', '').lower()}-{obj.contract}-{today.strftime('%Y%m%d')}-nmap-{scan_type}-"
+               f"{obj.analyst}")
 
-        # Run the Top 65K TCP ports for each IP/domain
-        # BEWARE!  This could take a long time.  Many clients limit the timeframe of testing for each day.
-        print(f"Nmap scan on {obj.scope[i].address}...\nRunning the Top 1000 nmap scan (UDP) on each IP/domain...")
-        system(f"nmap -sS -vv -n -Pn --max-retries 2 -p- -oA {pwd}/{obj.client.replace(' ', '').lower()}-"
-               f"{obj.contract}-date-nmap-s65K-{obj.analyst} {obj.scope[i].address}")
+    # Run the Top 65K TCP ports for each IP/domain
+    # BEWARE!  This could take a long time.  Many clients limit the timeframe of testing for each day.
+    elif scan_type == 's65K':
+        system(f"nmap -sS -vv -n -Pn --max-retries 2 -p- -iL {args.scope} -oA {pwd}/"
+               f"{obj.client.replace(' ', '').lower()}-{obj.contract}-{today.strftime('%Y%m%d')}-nmap-{scan_type}-"
+               f"{obj.analyst}")
+
+    else:
+        raise Exception(f"Scan type '{scan_type}' is invalid.")
+
+
+def do_scans(obj: object):
+    [run_scan(obj, x) for x in scan_types]
+
 
 # Run the function to validate the argument parameters
 run_checks(args.client, args.contract, args.scope)
@@ -105,4 +123,7 @@ run_checks(args.client, args.contract, args.scope)
 scan = Scan(args.analyst, args.client, args.contract, create_scope(args.scope))
 
 # Run the scans
-run_scan(scan)
+do_scans(scan)
+
+[print(x) for x in scan_types]
+
