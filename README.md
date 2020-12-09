@@ -16,6 +16,12 @@ The following are requirements to use this script successfully:
 * Python 3.X
 * xsltproc
 
+## Installation
+Run the `install.py` script to install the manpage and file in the appropriate directories.
+```bash
+sudo python3 install.py
+```
+
 ## Options
 | Option                        | Description                                                                            |
 |-------------------------------|----------------------------------------------------------------------------------------|
