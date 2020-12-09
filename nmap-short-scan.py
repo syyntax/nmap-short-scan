@@ -131,6 +131,3 @@ scan = Scan(args.analyst, args.client, args.contract, create_scope(args.scope))
 # Run the scans
 do_scans(scan)
 convert_xsl()
-
-[print(x) for x in scan_types]
-
