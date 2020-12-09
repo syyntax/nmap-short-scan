@@ -84,7 +84,6 @@ def create_scope(scope: str):
 def run_scan(obj: object, scan_type):
     # Run the Top 1000 nmap scan (SYN) on each IP/domain
     if scan_type == 't1000':
-        print(f"Nmap scan on {obj.scope[i].address}...\nRunning the Top 1000 nmap scan (SYN) on each IP/domain...")
         system(f"nmap -sS -vv -n -Pn --max-retries 2 --top-ports 1000 -iL {args.scope} -oA {pwd}/"
                f"{obj.client.replace(' ', '').lower()}-{obj.contract}-{today.strftime('%Y%m%d')}-nmap-{scan_type}-"
                f"{obj.analyst}")
