@@ -1,7 +1,7 @@
 # Nmap-short-scan
 Perform a standard top-1000-port TCP/UDP scan with nmap and save the output to various formats.
 ## Description
-This tool is a python wrapper for specific nmap commands.
+This tool is a python wrapper for specific nmap commands. It outputs nmap results to gnmap, nmap, xml, and html formats.
 
 This application is intended for Linux systems using Python 3.X.
 
