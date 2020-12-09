@@ -115,7 +115,7 @@ def do_scans(obj: object):
     [run_scan(obj, x) for x in scan_types]
 
 
-def convert_xsl(file):
+def convert_xsl():
     files = [f for f in listdir(f'{pwd}') if path.isfile(f)]
     for f in files:
         if f[-4:] == ".xml":
@@ -130,6 +130,7 @@ scan = Scan(args.analyst, args.client, args.contract, create_scope(args.scope))
 
 # Run the scans
 do_scans(scan)
+convert_xsl()
 
 [print(x) for x in scan_types]
 
