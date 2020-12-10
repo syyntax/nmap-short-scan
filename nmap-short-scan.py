@@ -10,7 +10,16 @@ regex_name = compile(f"^[A-Za-z].*\s[A-Za-z].*$") # Regex for first and last nam
 regex_contract = compile("^[0-9]{8}$") # Regex for client contract numbers
 regex_ip4 = compile("^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4]"
                     "[0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$") # Regex for IPv4
+regex_ip6 = compile("(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:"
+                    "[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:"
+                    "[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}"
+                    "(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)"
+                    "|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1"
+                    "{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:"
+                    "((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))")
 regex_domain = compile("(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]") # Domain regex
+regex_cidr = compile("^(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}"
+                     "(/(3[012]|[12]\d|\d))$") # Regex for IPv4 CIDR
 scan_types = ['t1000', 'u1000', 'a1000', 's65K']
 today = date.today()
 
@@ -45,7 +54,8 @@ class Asset:
     def add(self, address: str):
         if address is None:
             raise Exception(f"You must provide an IP or URL.")
-        elif match(regex_ip4, address) or match(regex_domain, address):
+        elif match(regex_ip4, address) or match(regex_domain, address) or match(regex_ip6, address)\
+                or match(regex_cidr, address):
             self.address = str(address)
         else:
             raise Exception(f"\"{address}\" does not match a valid pattern for IPv4 or domain.")
